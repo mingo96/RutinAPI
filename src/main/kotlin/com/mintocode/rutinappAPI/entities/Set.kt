@@ -10,9 +10,9 @@ import jakarta.persistence.ManyToOne
 @Entity(name = "Sets")
 data class SetEntity(
     @Id @GeneratedValue(strategy = GenerationType.AUTO) val setId: Long = 0,
-    @ManyToOne(optional = false, cascade = [CascadeType.REMOVE])
+    @ManyToOne(optional = false)
     val exerciseDone: ExerciseEntity,
-    @ManyToOne(optional = false, cascade = [CascadeType.REMOVE])
+    @ManyToOne(optional = false, cascade = [CascadeType.MERGE])
     val workoutDoneId: WorkOutEntity,
     val weight: Double,
     val reps: Int,

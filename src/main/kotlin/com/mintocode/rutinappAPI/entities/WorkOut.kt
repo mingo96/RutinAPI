@@ -1,11 +1,6 @@
 package com.mintocode.rutinappAPI.entities
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.OneToMany
+import jakarta.persistence.*
 
 
 @Entity(name = "WorkOuts")
@@ -14,10 +9,10 @@ data class WorkOutEntity(
     val date: Long,
     var title: String,
     var isFinished: Boolean,
-    @ManyToOne(targetEntity = RoutineEntity::class, optional = true)
+    @ManyToOne(targetEntity = RoutineEntity::class, optional = true, cascade = [CascadeType.MERGE, CascadeType.REFRESH])
     var routineEntity: RoutineEntity? = null,
-    @OneToMany(targetEntity = ExerciseEntity::class)
+    @ManyToOne(targetEntity = ExerciseEntity::class, cascade = [CascadeType.MERGE, CascadeType.REFRESH])
     var exercises : List<ExerciseEntity>?=null,
-    @OneToMany(targetEntity = SetEntity::class)
+    @OneToMany(targetEntity = SetEntity::class, mappedBy = "workoutDoneId", cascade = [CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE])
     var sets : List<SetEntity>? =null
 )

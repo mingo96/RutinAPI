@@ -31,6 +31,7 @@ class ExercisesController(@Autowired private val exerciseService: ExerciseServic
         newExercise.userId = userId
 
         val response = exerciseService.addExercise(newExercise)
+
         return ResponseEntity.ok(response)
 
     }
