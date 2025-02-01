@@ -17,7 +17,7 @@ data class ExerciseRoutine(
     val id: ExerciseRoutineId,
     @ManyToOne(cascade = [CascadeType.MERGE, CascadeType.REFRESH], targetEntity = ExerciseEntity::class)
     @MapsId(value = "exerciseId")
-    var exerciseEntity: ExerciseEntity,
+    var exerciseEntity: ExerciseEntity?= null,
     @ManyToOne(cascade = [CascadeType.MERGE, CascadeType.REFRESH], targetEntity = RoutineEntity::class)
     @MapsId(value = "routineId")
     var routineEntity: RoutineEntity? = null,

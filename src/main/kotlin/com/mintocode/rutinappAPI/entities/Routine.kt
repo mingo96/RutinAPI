@@ -1,5 +1,7 @@
 package com.mintocode.rutinappAPI.entities
 
+import com.mintocode.rutinappAPI.controllers.ExerciseModel
+import com.mintocode.rutinappAPI.controllers.RoutineModel
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -39,5 +41,17 @@ data class RoutineEntity(
     @Override
     override fun toString(): String {
         return this::class.simpleName + "(  routineId = $routineId )"
+    }
+
+    fun toModel(requestUserId: Long): RoutineModel {
+        val exercises = exerciseRelations?.map { it.exerciseEntity!!.toModel(requestUserId, it) }?.toMutableList()
+        return RoutineModel(
+            id = 0,
+            name = name,
+            targetedBodyPart = targetedBodyPart,
+            exercises = exercises?: mutableListOf(),
+            realId = routineId.toInt(),
+            isFromThisUser = requestUserId == userId
+        )
     }
 }

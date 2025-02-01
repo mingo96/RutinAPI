@@ -46,7 +46,9 @@ class ExerciseService(@Autowired private val exerciseRepository: ExerciseReposit
                     userId,
                     exerciseEntity.exerciseId
                 )
-            ) exerciseRepository.save(exerciseEntity)
+            ) {
+                exerciseRepository.save(exerciseEntity)
+            }
             else null
         } catch (e: Exception) {
             null
