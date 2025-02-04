@@ -6,4 +6,8 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface WorkoutRepository : JpaRepository<WorkOutEntity, Long> {
+    fun findByUserId(userId: Long): List<WorkOutEntity>
+
+
+    fun existsByWorkOutIdAndUserIdAllIgnoreCase(workOutId: Long, userId: Long): Boolean
 }

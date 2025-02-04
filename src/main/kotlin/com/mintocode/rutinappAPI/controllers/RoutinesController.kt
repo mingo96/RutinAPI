@@ -28,12 +28,7 @@ class RoutinesController(
         }
         val userId = userService.idOfToken(token)
 
-        val response = routineService.addRoutine(routineEntity.toEntity(userId)) ?: return ResponseEntity.status(
-            HttpStatus.CONFLICT
-        ).build()
-
-        return ResponseEntity.ok(response.toModel(userId))
-
+        return ResponseEntity.ok(routineService.addRoutine(routineEntity, userId)?.toModel(userId))
     }
 
     @GetMapping("/myroutines")
@@ -51,7 +46,7 @@ class RoutinesController(
 
     }
 
-    @PutMapping("/editroutine")
+    @PostMapping("/editroutine")
     fun editRoutine(
         @RequestBody routineEntity: RoutineModel, @RequestHeader("Authorization") token: String
     ): ResponseEntity<RoutineModel?> {
@@ -61,11 +56,12 @@ class RoutinesController(
         if (!isAuthorized) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build() // Return 401 Unauthorized
         }
-
         val userId = userService.idOfToken(token)
 
-        val response = routineService.addRoutine(routineEntity.toEntity(userId)) ?: return ResponseEntity.status(
-            HttpStatus.CONFLICT
+        val response = routineService.updateRoutine(routineEntity, userId)
+
+        response ?: return ResponseEntity.status(
+            HttpStatus.UNAUTHORIZED
         ).build()
 
         return ResponseEntity.ok(response.toModel(userId))
@@ -84,16 +80,9 @@ data class RoutineModel(
 ) {
     fun toEntity(userId: Long = 0L): RoutineEntity {
         return RoutineEntity(
-            routineId = id.toLong(),
+            routineId = realId.toLong(),
             name = name,
             targetedBodyPart = targetedBodyPart,
-            exerciseRelations = exercises.map {
-                ExerciseRoutine(
-                    id = ExerciseRoutineId(it.realId, id.toLong()),
-                    observations = it.observations,
-                    setsAndReps = it.setsAndReps
-                )
-            },
             userId = userId
         )
     }

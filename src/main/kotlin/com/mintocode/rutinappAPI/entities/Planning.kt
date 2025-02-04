@@ -7,8 +7,10 @@ import org.hibernate.proxy.HibernateProxy
 data class PlanningEntity(
     @Id @GeneratedValue(strategy = GenerationType.AUTO) val id: Long = 0,
     val date: Long,
-    @ManyToOne(optional = true, cascade = [CascadeType.MERGE])
+    @ManyToOne(optional = true, cascade = [CascadeType.MERGE, CascadeType.REMOVE])
     var routineId: PlanningEntity?,
+    @ManyToOne(cascade = [CascadeType.MERGE, CascadeType.REMOVE])
+    var userEntity: UserEntity,
     var bodyPart: String?
 ) {
     final override fun equals(other: Any?): Boolean {

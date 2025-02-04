@@ -7,26 +7,29 @@ import org.hibernate.proxy.HibernateProxy
 
 @Entity(name = "Exercises")
 data class ExerciseEntity(
-    @Id @GeneratedValue(strategy = GenerationType.AUTO) val exerciseId: Long = 0,
+    @Id @GeneratedValue(strategy = GenerationType.AUTO) @Column(
+        name = "exercise_id",
+        unique = true,
+        nullable = false
+    ) val exerciseId: Long = 0,
     var exerciseName: String = "",
     var exerciseDescription: String = "",
     var targetedBodyPart: String = "",
-    var userId: Long = 0,
-    @ManyToMany(targetEntity = ExerciseEntity::class, cascade = [CascadeType.MERGE, CascadeType.PERSIST], mappedBy = "exerciseId")
-    var relatedExercises : List<ExerciseEntity>?=null
+    val userId: Long = 0,
+    @ManyToMany(targetEntity = ExerciseEntity::class, cascade = [CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH])
+    var relatedExercises: List<ExerciseEntity>? = null
 ) {
-    fun toModel(requestUserId : Long, exerciseRoutine: ExerciseRoutine?=null) : ExerciseModel{
+    fun toModel(requestUserId: Long, exerciseRoutine: ExerciseRoutine? = null): ExerciseModel {
         return ExerciseModel(
-            id = exerciseId.toString(),
+            id = "0",
             realId = exerciseId,
             name = exerciseName,
             description = exerciseDescription,
             isFromThisUser = userId == requestUserId,
             targetedBodyPart = targetedBodyPart,
-            equivalentExercises = relatedExercises?.map { it.toModel(requestUserId) } ?: emptyList(),
-            observations = exerciseRoutine?.observations?:"",
-            setsAndReps = exerciseRoutine?.setsAndReps?:""
-            )
+            equivalentExercises = relatedExercises?.map { it.exerciseId.toInt() } ?: emptyList(),
+            observations = exerciseRoutine?.observations ?: "",
+            setsAndReps = exerciseRoutine?.setsAndReps ?: "")
     }
 
     final override fun equals(other: Any?): Boolean {

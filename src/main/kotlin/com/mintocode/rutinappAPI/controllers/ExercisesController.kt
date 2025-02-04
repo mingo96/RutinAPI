@@ -34,9 +34,24 @@ class ExercisesController(
         }
         val userId = userService.idOfToken(token)
 
-        val response = exerciseService.addExercise(newExercise.toEntity(userId))
+        val response = exerciseService.addExercise(newExercise, userId)
 
         return ResponseEntity.ok(response?.toModel(userId))
+
+    }
+
+    @GetMapping("/findbybodypart")
+    fun getExercisesByBodyPart(@RequestHeader("Authorization") token: String, @RequestHeader("bodyPart") bodyPart: String): ResponseEntity<List<ExerciseModel>>{
+        val isAuthorized = userService.tokenIsAuthorized(token)
+
+        if (!isAuthorized) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build() // Return 401 Unauthorized
+        }
+        val userId = userService.idOfToken(token)
+
+        val response = exerciseService.fetchByBodyPart(bodyPart) ?: return ResponseEntity.status(HttpStatus.CONFLICT).build()
+
+        return ResponseEntity.ok(response.map { it.toModel(userId) })
 
     }
 
@@ -57,7 +72,7 @@ class ExercisesController(
         return ResponseEntity.ok((createdExercises ?: listOf()) + (savedExercises ?: emptyList()))
     }
 
-    @PutMapping
+    @PutMapping("/updateexercise")
     fun updateExercise(
         @RequestBody exerciseEntity: ExerciseModel, @RequestHeader("Authorization") token: String
     ): ResponseEntity<ExerciseModel?> {
@@ -69,7 +84,7 @@ class ExercisesController(
 
         val userId = userService.idOfToken(token)
 
-        val response = exerciseService.updateExercise(exerciseEntity.toEntity(), userId)
+        val response = exerciseService.updateExercise(exerciseEntity, userId)
 
         return if (response != null) ResponseEntity.ok(response.toModel(userId)) else ResponseEntity.status(HttpStatus.UNAUTHORIZED)
             .build()
@@ -85,16 +100,30 @@ data class ExerciseModel(
     var name: String,
     var description: String,
     var targetedBodyPart: String,
-    var equivalentExercises: List<ExerciseModel> = emptyList(),
+    var equivalentExercises: List<Int> = emptyList(),
     var setsAndReps: String = "",
     var observations: String = "",
     val isFromThisUser: Boolean = true
 ) {
+    /**[ExerciseEntity.relatedExercises] is not created because this entity just has the ids of the related exercises*/
     fun toEntity(userId: Long = 0L): ExerciseEntity = ExerciseEntity(
-        exerciseId = id.toLongOrNull() ?: 0L,
+        exerciseId = realId,
         exerciseName = name,
         exerciseDescription = description,
         targetedBodyPart = targetedBodyPart,
         userId = userId,
-        relatedExercises = equivalentExercises.map { it.toEntity() })
+        )
 }
+/*
+{
+    "id":"0",
+    "realId":0,
+    "name":"",
+    "description":"",
+    "targetedBodyPart":"",
+    "equivalentExercises":[],
+    "setsAndReps":"",
+    "observations": "",
+    "isFromThisUser":true
+}
+ * */

@@ -1,13 +1,11 @@
 package com.mintocode.rutinappAPI.entities
 
-import com.mintocode.rutinappAPI.controllers.ExerciseModel
 import com.mintocode.rutinappAPI.controllers.RoutineModel
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.ManyToMany
 import jakarta.persistence.OneToMany
 import org.hibernate.proxy.HibernateProxy
 
@@ -17,8 +15,8 @@ data class RoutineEntity(
     @Id @GeneratedValue(strategy = GenerationType.AUTO) val routineId: Long,
     var name: String,
     var targetedBodyPart: String,
-    @OneToMany(mappedBy = "routineEntity", cascade = [CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE], targetEntity = ExerciseRoutine::class)
-    var exerciseRelations : List<ExerciseRoutine>?,
+    @OneToMany(mappedBy = "routine", cascade = [CascadeType.ALL], targetEntity = ExerciseRoutine::class)
+    var exerciseRelations : List<ExerciseRoutine>?=null,
     var userId: Long
 ) {
 
@@ -44,7 +42,7 @@ data class RoutineEntity(
     }
 
     fun toModel(requestUserId: Long): RoutineModel {
-        val exercises = exerciseRelations?.map { it.exerciseEntity!!.toModel(requestUserId, it) }?.toMutableList()
+        val exercises = exerciseRelations?.map { it.exercise.toModel(requestUserId, it) }?.toMutableList()
         return RoutineModel(
             id = 0,
             name = name,

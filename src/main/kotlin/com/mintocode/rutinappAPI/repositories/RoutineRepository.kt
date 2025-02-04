@@ -7,4 +7,8 @@ import org.springframework.stereotype.Repository
 @Repository
 interface RoutineRepository : JpaRepository<RoutineEntity, Long> {
     fun findByUserId(userId: Long): List<RoutineEntity>?
+
+    fun findByUserIdAndRoutineId(userId: Long, routineId: Long): RoutineEntity?
+
+
 }
